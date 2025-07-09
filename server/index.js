@@ -9,9 +9,15 @@ dotenv.config({ path: path.resolve(__dirname, 'config.env') });
 
 // Initialize Express app
 const app = express();
+const allowedOrigins = [
+  'https://my-portfolio-bfgg.onrender.com' // frontend
+];
 
-// Middleware
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
