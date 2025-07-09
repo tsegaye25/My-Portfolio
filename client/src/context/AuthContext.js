@@ -83,7 +83,6 @@ export const AuthProvider = ({ children }) => {
         validUsers.push({ email: 'admin@portfolio.com', password: 'admin123', name: 'Admin User' });
         localStorage.setItem('validUsers', JSON.stringify(validUsers));
       }
-      
       // Check if user exists and password matches
       const user = validUsers.find(user => user.email === email);
       
@@ -252,8 +251,7 @@ export const AuthProvider = ({ children }) => {
           }
           
           // Save updated users to localStorage
-          localStorage.setItem('validUsers', JSON.stringify(validUsers));
-          
+          localStorage.setItem('validUsers', JSON.stringify(validUsers));    
         }
       }
       
