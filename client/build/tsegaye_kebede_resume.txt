@@ -1,0 +1,71 @@
+TSEGAYE KEBEDE BADE
+Full Stack Developer
+tdrag301@gmail.com | +251925480393 | Addis Ababa, Ethiopia
+
+PROFESSIONAL SUMMARY
+-----------------
+Passionate Full Stack Developer with 5+ years of experience building modern web applications. Expertise in MERN stack (MongoDB, Express.js, React, Node.js) and creating responsive, user-friendly interfaces. Strong problem-solving skills and commitment to delivering high-quality code.
+
+TECHNICAL SKILLS
+--------------
+• Frontend: React.js, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS, Redux
+• Backend: Node.js, Express.js, RESTful APIs
+• Databases: MongoDB, MySQL, PostgreSQL
+• Tools: Git, GitHub, VS Code, Postman, Webpack
+• Other: Responsive Design, Authentication & Authorization, API Integration
+
+WORK EXPERIENCE
+-------------
+Senior Full Stack Developer
+XYZ Tech Solutions | 2023 - Present
+• Developed and maintained multiple web applications using React.js and Node.js
+• Implemented responsive UI designs using Tailwind CSS and Material UI
+• Created RESTful APIs for client-server communication
+• Collaborated with cross-functional teams to deliver projects on time
+• Mentored junior developers and conducted code reviews
+
+Full Stack Developer
+ABC Web Services | 2020 - 2023
+• Built and deployed full-stack web applications using the MERN stack
+• Designed and implemented database schemas and models
+• Integrated third-party APIs for enhanced functionality
+• Optimized application performance and fixed bugs
+• Participated in Agile development processes
+
+Junior Web Developer
+Tech Innovators | 2018 - 2020
+• Assisted in developing responsive websites using HTML, CSS, and JavaScript
+• Collaborated with senior developers to implement new features
+• Performed testing and debugging of web applications
+• Created and maintained documentation for projects
+
+EDUCATION
+--------
+Bachelor of Science in Computer Science
+University of Addis Ababa | 2014 - 2018
+
+PROJECTS
+-------
+Personal Portfolio Website
+• A responsive portfolio website built with React.js and Tailwind CSS
+• Features include project showcase, contact form, and blog section
+• GitHub: https://github.com/tsegaye25/portfolio
+
+E-Commerce Platform
+• Full-stack e-commerce application with user authentication and payment integration
+• Built using React.js, Node.js, Express, and MongoDB
+• GitHub: https://github.com/tsegaye25/ecommerce
+
+Task Management App
+• Collaborative task management application with real-time updates
+• Technologies: React.js, Node.js, Socket.io, MongoDB
+• GitHub: https://github.com/tsegaye25/taskmanager
+
+LANGUAGES
+--------
+• English (Fluent)
+• Amharic (Native)
+
+INTERESTS
+--------
+Web Development, Open Source Contribution, New Technologies, Reading, Hiking

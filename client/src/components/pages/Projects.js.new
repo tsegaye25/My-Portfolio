@@ -1,0 +1,514 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaGithub, FaExternalLinkAlt, FaSearch, FaTimes, FaCode, FaStar, FaCodeBranch } from 'react-icons/fa';
+import axios from 'axios';
+
+const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchGithubProjects = async () => {
+      try {
+        setLoading(true);
+        
+        // Check if we have cached projects in localStorage and if they're recent (less than 1 hour old)
+        const cachedProjects = localStorage.getItem('githubProjects');
+        const cachedTimestamp = localStorage.getItem('githubProjectsTimestamp');
+        
+        if (cachedProjects && cachedTimestamp) {
+          const now = new Date().getTime();
+          const cacheTime = parseInt(cachedTimestamp);
+          
+          // If cache is less than 1 hour old, use it
+          if (now - cacheTime < 60 * 60 * 1000) {
+            const parsedProjects = JSON.parse(cachedProjects);
+            setProjects(parsedProjects);
+            setFilteredProjects(parsedProjects);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // Fetch repositories from GitHub API
+        const username = 'tsegaye25'; // Your GitHub username
+        const response = await axios.get(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+        
+        // Transform GitHub data to match our project structure
+        const githubProjects = response.data.map(repo => {
+          // Determine categories based on repo topics or language
+          const categories = [];
+          
+          // Add 'web' category for typical web technologies
+          if (['JavaScript', 'TypeScript', 'HTML', 'CSS'].includes(repo.language)) {
+            categories.push('web');
+          }
+          
+          // Add 'api' category for backend technologies
+          if (['Node', 'Express', 'Python', 'Java', 'PHP'].includes(repo.language)) {
+            categories.push('api');
+          }
+          
+          // Add 'mobile' category if repo name suggests mobile app
+          if (repo.name.toLowerCase().includes('mobile') || 
+              repo.name.toLowerCase().includes('android') || 
+              repo.name.toLowerCase().includes('ios') || 
+              repo.name.toLowerCase().includes('react-native')) {
+            categories.push('mobile');
+          }
+          
+          // Ensure at least one category
+          if (categories.length === 0) {
+            categories.push('web');
+          }
+          
+          return {
+            id: repo.id,
+            title: repo.name.replace(/-/g, ' ').replace(/_/g, ' '),
+            description: repo.description || 'No description available',
+            image: '/logo192.png', // Default image
+            technologies: [repo.language].filter(Boolean),
+            github: repo.html_url,
+            live: repo.homepage || '',
+            categories: categories,
+            stars: repo.stargazers_count,
+            forks: repo.forks_count,
+            updated: repo.updated_at
+          };
+        });
+        
+        // Filter out forked repositories that don't have descriptions
+        const filteredRepos = githubProjects.filter(project => 
+          !(project.fork && !project.description)
+        );
+        
+        // Sort by most recently updated
+        filteredRepos.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+        
+        // Cache the projects in localStorage
+        localStorage.setItem('githubProjects', JSON.stringify(filteredRepos));
+        localStorage.setItem('githubProjectsTimestamp', new Date().getTime().toString());
+        
+        setProjects(filteredRepos);
+        setFilteredProjects(filteredRepos);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching GitHub projects:', err);
+        
+        // If API fails, try to use cached data even if it's old
+        const cachedProjects = localStorage.getItem('githubProjects');
+        if (cachedProjects) {
+          setProjects(JSON.parse(cachedProjects));
+          setFilteredProjects(JSON.parse(cachedProjects));
+          setError('Using cached projects. Failed to fetch latest projects from GitHub.');
+        } else {
+          // Fall back to sample data if no cache is available
+          setProjects(sampleProjects);
+          setFilteredProjects(sampleProjects);
+          setError('Failed to fetch projects from GitHub. Showing sample projects instead.');
+        }
+        
+        setLoading(false);
+      }
+    };
+
+    fetchGithubProjects();
+  }, []);
+
+  useEffect(() => {
+    filterProjects(activeFilter, searchTerm);
+  }, [activeFilter, searchTerm, projects]);
+
+  const filterProjects = (category, term) => {
+    let filtered = [...projects];
+    
+    // Filter by category
+    if (category !== 'all') {
+      filtered = filtered.filter(project => 
+        project.categories.includes(category)
+      );
+    }
+    
+    // Filter by search term
+    if (term) {
+      filtered = filtered.filter(project => 
+        project.title.toLowerCase().includes(term.toLowerCase()) || 
+        project.description.toLowerCase().includes(term.toLowerCase()) ||
+        project.technologies.some(tech => 
+          tech && tech.toLowerCase().includes(term.toLowerCase())
+        )
+      );
+    }
+    
+    setFilteredProjects(filtered);
+  };
+
+  const handleFilterClick = (category) => {
+    setActiveFilter(category);
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  if (loading) return (
+    <div className="container mx-auto px-4 py-20 text-center">
+      <div className="flex justify-center items-center space-x-2">
+        <div className="w-4 h-4 rounded-full bg-indigo-600 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+        <div className="w-4 h-4 rounded-full bg-indigo-600 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+        <div className="w-4 h-4 rounded-full bg-indigo-600 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+      </div>
+      <p className="mt-4 text-gray-600">Loading projects from GitHub...</p>
+    </div>
+  );
+
+  return (
+    <div className="pt-16">
+      {/* Projects Header */}
+      <section className="bg-gradient-to-r from-indigo-800 to-purple-800 text-white py-20 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20">
+          <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-indigo-400 blur-3xl"></div>
+          <div className="absolute top-1/2 right-10 w-80 h-80 rounded-full bg-purple-400 blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.span 
+              className="inline-block mb-4 bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-medium"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <FaCode className="inline mr-2" /> My Work
+            </motion.span>
+            
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200">My Projects</span>
+            </h1>
+            
+            <p className="text-xl max-w-3xl mx-auto text-indigo-100 leading-relaxed">
+              Explore my portfolio of web development projects built with the MERN stack and other modern technologies.
+            </p>
+          </motion.div>
+        </div>
+        
+        {/* Bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+      </section>
+
+      {/* Projects Filter and Search */}
+      <section className="py-10 bg-white border-b">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            {/* Filter Buttons */}
+            <div className="flex flex-wrap justify-center mb-6 md:mb-0">
+              <button 
+                className={`px-4 py-2 mx-2 rounded-full transition-all ${
+                  activeFilter === 'all' 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700'
+                }`}
+                onClick={() => handleFilterClick('all')}
+              >
+                All
+              </button>
+              <button 
+                className={`px-4 py-2 mx-2 rounded-full transition-all ${
+                  activeFilter === 'web' 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700'
+                }`}
+                onClick={() => handleFilterClick('web')}
+              >
+                Web Apps
+              </button>
+              <button 
+                className={`px-4 py-2 mx-2 rounded-full transition-all ${
+                  activeFilter === 'mobile' 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700'
+                }`}
+                onClick={() => handleFilterClick('mobile')}
+              >
+                Mobile Apps
+              </button>
+              <button 
+                className={`px-4 py-2 mx-2 rounded-full transition-all ${
+                  activeFilter === 'api' 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700'
+                }`}
+                onClick={() => handleFilterClick('api')}
+              >
+                APIs
+              </button>
+            </div>
+            
+            {/* Search Box */}
+            <div className="relative w-full md:w-64">
+              <input
+                type="text"
+                placeholder="Search projects..."
+                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+              <FaSearch className="absolute left-3 top-3 text-indigo-400" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Error Message */}
+      {error && (
+        <div className="container mx-auto px-4 py-4">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-800">
+            <p>{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Projects Grid */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          <AnimatePresence>
+            {filteredProjects.length === 0 ? (
+              <motion.div 
+                className="text-center py-20"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.5 }}
+              >
+                <FaTimes className="text-red-500 text-4xl mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-700">No projects found</h3>
+                <p className="text-gray-500 mt-2">Try adjusting your search or filter criteria</p>
+              </motion.div>
+            ) : (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1
+                    }
+                  }
+                }}
+                initial="hidden"
+                animate="show"
+              >
+                {filteredProjects.map((project, index) => (
+                  <motion.div 
+                    key={project.id}
+                    className="group perspective"
+                    variants={{
+                      hidden: { opacity: 0, y: 50 },
+                      show: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <motion.div 
+                      className="relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform-gpu"
+                      style={{ 
+                        transformStyle: "preserve-3d",
+                        boxShadow: "0 10px 30px -15px rgba(0, 0, 0, 0.2)"
+                      }}
+                      whileHover={{
+                        rotateY: 5,
+                        rotateX: 5
+                      }}
+                    >
+                      <div className="relative overflow-hidden">
+                        <img 
+                          src={project.image || '/logo192.png'} 
+                          alt={project.title} 
+                          className="w-full h-64 object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-start p-6">
+                          <div className="flex space-x-3 translate-y-10 group-hover:translate-y-0 transition-transform duration-300">
+                            <a 
+                              href={project.github} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="bg-white text-blue-700 p-3 rounded-full hover:bg-blue-50 transition-colors transform hover:scale-110 shadow-lg"
+                              aria-label="View GitHub Repository"
+                            >
+                              <FaGithub size={20} />
+                            </a>
+                            {project.live && (
+                              <a 
+                                href={project.live} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3 rounded-full hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-110 shadow-lg"
+                                aria-label="View Live Project"
+                              >
+                                <FaExternalLinkAlt size={20} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Featured badge */}
+                        {index < 2 && (
+                          <div className="absolute top-4 right-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-3">
+                            Featured
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold mb-2 text-gray-800 group-hover:text-indigo-600 transition-colors">{project.title}</h3>
+                        <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
+                        
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {project.technologies.map((tech, techIndex) => (
+                            tech && (
+                              <span 
+                                key={techIndex}
+                                className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+                              >
+                                {tech}
+                              </span>
+                            )
+                          ))}
+                        </div>
+                        
+                        {/* GitHub stats */}
+                        <div className="flex items-center mt-4 text-gray-600 space-x-4">
+                          <div className="flex items-center">
+                            <FaStar className="mr-1 text-yellow-500" />
+                            <span>{project.stars || 0}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <FaCodeBranch className="mr-1 text-blue-500" />
+                            <span>{project.forks || 0}</span>
+                          </div>
+                          <div className="text-xs">
+                            Updated: {project.updated ? new Date(project.updated).toLocaleDateString() : 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Load more button */}
+          {filteredProjects.length > 6 && (
+            <motion.div 
+              className="text-center mt-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <button 
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-full font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                Load More Projects
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// Sample data for the projects page - used as fallback if GitHub API fails
+const sampleProjects = [
+  {
+    id: 1,
+    title: 'E-Commerce Platform',
+    description: 'A full-stack e-commerce platform with user authentication, product management, and payment integration.',
+    image: '/logo192.png',
+    technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'Redux', 'Stripe'],
+    github: 'https://github.com/tsegaye25',
+    live: 'https://example.com',
+    categories: ['web', 'api'],
+    stars: 5,
+    forks: 2,
+    updated: new Date().toISOString()
+  },
+  {
+    id: 2,
+    title: 'Task Management App',
+    description: 'A collaborative task management application with real-time updates and team collaboration features.',
+    image: '/logo192.png',
+    technologies: ['React', 'Node.js', 'Socket.io', 'MongoDB', 'Express'],
+    github: 'https://github.com/tsegaye25',
+    live: 'https://example.com',
+    categories: ['web'],
+    stars: 3,
+    forks: 1,
+    updated: new Date().toISOString()
+  },
+  {
+    id: 3,
+    title: 'Blog Platform',
+    description: 'A content management system for creating and managing blog posts with user authentication.',
+    image: '/logo192.png',
+    technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'Cloudinary'],
+    github: 'https://github.com/tsegaye25',
+    live: 'https://example.com',
+    categories: ['web'],
+    stars: 4,
+    forks: 0,
+    updated: new Date().toISOString()
+  },
+  {
+    id: 4,
+    title: 'Weather Application',
+    description: 'A weather forecast application that provides real-time weather information based on location.',
+    image: '/logo192.png',
+    technologies: ['React Native', 'Node.js', 'Express', 'Weather API'],
+    github: 'https://github.com/tsegaye25',
+    live: 'https://example.com',
+    categories: ['mobile', 'api'],
+    stars: 2,
+    forks: 1,
+    updated: new Date().toISOString()
+  },
+  {
+    id: 5,
+    title: 'Social Media API',
+    description: 'A RESTful API for a social media platform with features like user authentication, posts, comments, and likes.',
+    image: '/logo192.png',
+    technologies: ['Node.js', 'Express', 'MongoDB', 'JWT', 'Socket.io'],
+    github: 'https://github.com/tsegaye25',
+    live: 'https://example.com',
+    categories: ['api'],
+    stars: 7,
+    forks: 3,
+    updated: new Date().toISOString()
+  },
+  {
+    id: 6,
+    title: 'Real Estate Marketplace',
+    description: 'A platform for buying, selling, and renting properties with advanced search and filtering options.',
+    image: '/logo192.png',
+    technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'Google Maps API'],
+    github: 'https://github.com/tsegaye25',
+    live: 'https://example.com',
+    categories: ['web', 'api'],
+    stars: 6,
+    forks: 2,
+    updated: new Date().toISOString()
+  }
+];
+
+export default Projects;

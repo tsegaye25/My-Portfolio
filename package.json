@@ -1,0 +1,29 @@
+{
+  "name": "tsegaye-kebede-portfolio",
+  "version": "1.0.0",
+  "description": "Personal portfolio website for Tsegaye Kebede Baed",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "nodemon server/index.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && npm install --prefix client && npm install --prefix server"
+  },
+  "keywords": [
+    "portfolio",
+    "mern",
+    "react",
+    "node",
+    "express",
+    "mongodb"
+  ],
+  "author": "Tsegaye Kebede Baed",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
