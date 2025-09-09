@@ -16,6 +16,7 @@ import Experience from './components/pages/Experience';
 import Education from './components/pages/Education';
 import Contact from './components/pages/Contact';
 import Login from './components/pages/Login';
+import ResetPassword from './components/pages/ResetPassword';
 import Dashboard from './components/pages/Dashboard';
 import NotFound from './components/pages/NotFound';
 
@@ -38,6 +39,7 @@ const App = () => {
             <Route path="/education" element={<Education />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
             <Route 
               path="/dashboard/*" 
               element={

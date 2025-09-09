@@ -33,6 +33,7 @@ const experienceRoutes = require('./routes/experiences');
 const educationRoutes = require('./routes/education');
 const contactRoutes = require('./routes/contact');
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
 
 // Use routes
 app.use('/api/projects', projectRoutes);
@@ -41,6 +42,7 @@ app.use('/api/experiences', experienceRoutes);
 app.use('/api/education', educationRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {

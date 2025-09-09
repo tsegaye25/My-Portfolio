@@ -69,8 +69,8 @@ export const AuthProvider = ({ children }) => {
       // If no users in localStorage, initialize with default users
       if (!validUsers || validUsers.length === 0) {
         validUsers = [
-          { email: 'tsegaye.kebede@example.com', password: 'password123', name: 'Tsegaye Kebede' },
           { email: 'admin@portfolio.com', password: 'admin123', name: 'Admin User' },
+          { email: 'tsegaye.kebede@example.com', password: 'password123', name: 'Tsegaye Kebede' },
           // For backward compatibility
           { email: 'admin@example.com', password: 'password123', name: 'Admin Example' }
         ];
@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }) => {
         validUsers.push({ email: 'admin@portfolio.com', password: 'admin123', name: 'Admin User' });
         localStorage.setItem('validUsers', JSON.stringify(validUsers));
       }
+      
       // Check if user exists and password matches
       const user = validUsers.find(user => user.email === email);
       
@@ -111,12 +112,6 @@ export const AuthProvider = ({ children }) => {
       // Set error message
       setError(err.message || 'Authentication failed. Please try again.');
       console.error('Login error:', err);
-      
-      // Clear any existing token
-      setToken(null);
-      setAuthToken(null);
-      setIsAuthenticated(false);
-      
       return false;
     }
   };

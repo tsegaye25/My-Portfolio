@@ -31,35 +31,35 @@ const Navbar = () => {
 
   return (
     <motion.nav 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
         scrolled 
-          ? 'backdrop-blur-md bg-white shadow-xl border-b-2 border-indigo-100' 
-          : 'backdrop-blur-md bg-gradient-to-r from-indigo-800 to-purple-800 text-white'
+          ? 'backdrop-blur-xl bg-white/95 shadow-2xl border-b border-gray-200/50' 
+          : 'backdrop-blur-xl bg-gradient-to-r from-slate-900/95 via-blue-900/95 to-indigo-900/95 text-white'
       }`}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
-      <div className="container mx-auto px-0 lg:px-4 py-4 max-w-6xl">
+      <div className="container mx-auto px-4 lg:px-6 py-3 max-w-7xl">
         <div className="flex items-center justify-between w-full">
           {/* Logo and Brand */}
-          <div className="flex-none flex justify-start px-4">
-            <Link to="/" className="flex items-center group mb-0">
+          <div className="flex-none flex justify-start">
+            <Link to="/" className="flex items-center group">
               <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.5 }}
-                className="mr-3"
+                whileHover={{ rotate: 360, scale: 1.1 }}
+                transition={{ duration: 0.6, type: "spring", stiffness: 300 }}
+                className="mr-3 p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg"
               >
-                <FaCode className={`${scrolled ? 'text-indigo-600' : 'text-white'} text-3xl`} />
+                <FaCode className="text-white text-xl" />
               </motion.div>
-              <div className={`text-2xl font-bold ${scrolled ? 'text-gray-800' : 'text-white'}`}>
+              <div className={`text-xl lg:text-2xl font-bold bg-gradient-to-r ${scrolled ? 'from-gray-800 to-gray-600' : 'from-white to-gray-200'} bg-clip-text text-transparent`}>
                 Tsegaye Kebede
               </div>
             </Link>
           </div>
 
           {/* Desktop Menu - Center */}
-          <div className="hidden md:flex items-center gap-x-1 gap-y-2 lg:gap-x-2">
+          <div className="hidden lg:flex items-center gap-x-1 xl:gap-x-2">
             <NavItem to="/" icon={<FaHome />} label="Home" currentPath={location.pathname} scrolled={scrolled} />
             <NavItem to="/about" icon={<FaUser />} label="About" currentPath={location.pathname} scrolled={scrolled} />
             <NavItem to="/projects" icon={<FaCode />} label="Projects" currentPath={location.pathname} scrolled={scrolled} />
@@ -72,59 +72,79 @@ const Navbar = () => {
           </div>
 
           {/* Profile and Logout - Far Right */}
-          <div className="hidden md:flex items-center gap-x-3 pr-0 absolute right-4 top-1/2 transform -translate-y-1/2">
+          <div className="hidden lg:flex items-center gap-x-3">
             {isAuthenticated ? (
               <>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   {profileImage ? (
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:ring-2 hover:ring-indigo-300 transition-all">
+                    <motion.div 
+                      className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/50 shadow-lg hover:shadow-xl transition-all"
+                      whileHover={{ scale: 1.1 }}
+                    >
                       <img 
                         src={profileImage} 
                         alt="Profile" 
                         className="w-full h-full object-cover"
                       />
-                    </div>
+                    </motion.div>
                   ) : (
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${scrolled ? 'bg-indigo-100 text-indigo-600' : 'bg-indigo-600 text-white'} shadow-md`}>
-                      <FaUser size={16} />
-                    </div>
+                    <motion.div 
+                      className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      T
+                    </motion.div>
                   )}
                 </div>
                 <motion.button 
                   onClick={logout} 
-                  className={`flex items-center gap-1 px-2 lg:px-3 py-1 lg:py-2 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md text-xs lg:text-sm`}
-                  whileHover={{ scale: 1.05 }}
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                    scrolled 
+                      ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 shadow-sm hover:shadow-md' 
+                      : 'bg-white/10 text-white hover:bg-white/20 border border-white/20 backdrop-blur-sm'
+                  }`}
+                  whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <FaLock size={12} />
-                  <span>Logout</span>
+                  Logout
                 </motion.button>
               </>
             ) : (
-              <motion.div
-                whileHover={{ scale: 1.05 }}
+              <motion.div 
+                whileHover={{ scale: 1.05, y: -2 }} 
                 whileTap={{ scale: 0.95 }}
               >
                 <Link 
                   to="/login" 
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md`}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
+                    scrolled 
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl' 
+                      : 'bg-white/10 text-white hover:bg-white/20 border border-white/20 backdrop-blur-sm'
+                  }`}
                 >
-                  <FaLock size={16} />
-                  <span className="text-sm font-medium whitespace-nowrap">Login</span>
+                  <FaLock size={14} />
+                  <span>Login</span>
                 </Link>
               </motion.div>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden px-4">
-            <motion.button 
-              onClick={toggleMenu} 
-              className={`p-2 rounded-full ${scrolled ? 'text-gray-800' : 'text-white'} focus:outline-none`}
+          <div className="lg:hidden flex items-center">
+            <motion.button
+              onClick={toggleMenu}
+              className={`p-3 rounded-xl transition-all duration-300 ${
+                scrolled ? 'text-gray-700 hover:bg-gray-100 shadow-sm' : 'text-white hover:bg-white/20 backdrop-blur-sm'
+              }`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+              <motion.div
+                animate={{ rotate: isOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+              </motion.div>
             </motion.button>
           </div>
         </div>
@@ -132,21 +152,21 @@ const Navbar = () => {
         {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
-            <motion.div 
-              className="md:hidden bg-white/95 backdrop-blur-md mt-4 rounded-xl shadow-xl overflow-hidden"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            <motion.div
+              className="lg:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl shadow-2xl border-t border-gray-200/50"
+              initial={{ opacity: 0, height: 0, y: -20 }}
+              animate={{ opacity: 1, height: 'auto', y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
             >
-              <motion.div 
-                className="flex flex-col py-4 px-2"
+              <motion.div
+                className="py-6 px-4 max-h-96 overflow-y-auto"
                 variants={{
                   hidden: { opacity: 0 },
                   show: {
                     opacity: 1,
                     transition: {
-                      staggerChildren: 0.07
+                      staggerChildren: 0.1
                     }
                   }
                 }}
@@ -207,17 +227,27 @@ const Navbar = () => {
 const NavItem = ({ to, label, currentPath, icon, scrolled }) => {
   const isActive = currentPath === to;
   return (
-    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="mx-1">
+    <motion.div 
+      whileHover={{ scale: 1.05, y: -2 }} 
+      whileTap={{ scale: 0.95 }} 
+      className="mx-1"
+    >
       <Link
         to={to}
-        className={`flex items-center px-4 py-2 rounded-md transition-all duration-300 ${isActive 
-          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium shadow-md' 
+        className={`flex items-center px-4 py-2.5 rounded-xl transition-all duration-300 group ${isActive 
+          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-lg' 
           : scrolled 
-            ? 'text-gray-700 hover:bg-indigo-50' 
-            : 'text-white hover:bg-white/20'
+            ? 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600' 
+            : 'text-white hover:bg-white/20 backdrop-blur-sm'
         }`}
       >
-        <span className="text-base">{icon}</span>
+        <motion.span 
+          className="text-base"
+          whileHover={{ rotate: isActive ? 0 : 10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {icon}
+        </motion.span>
         <span className="ml-2 text-sm font-medium whitespace-nowrap">{label}</span>
       </Link>
     </motion.div>
@@ -234,18 +264,25 @@ const MobileNavItem = ({ to, label, toggleMenu, icon }) => {
         hidden: { opacity: 0, x: -20 },
         show: { opacity: 1, x: 0 }
       }}
-      whileHover={{ x: 5 }}
+      whileHover={{ x: 8, scale: 1.02 }}
+      className="mx-2"
     >
       <Link
         to={to}
-        className={`flex items-center text-gray-700 transition-colors block px-4 py-3 mx-2 rounded-lg ${isActive 
-          ? 'bg-blue-50 text-blue-600 font-medium' 
-          : 'hover:bg-gray-100'
+        className={`flex items-center transition-all duration-300 block px-5 py-4 rounded-xl group ${isActive 
+          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-lg' 
+          : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600'
         }`}
         onClick={toggleMenu}
       >
-        <span className="mr-3 text-blue-600">{icon}</span>
-        <span>{label}</span>
+        <motion.span 
+          className={`mr-4 text-lg ${isActive ? 'text-white' : 'text-blue-600'}`}
+          whileHover={{ rotate: 10, scale: 1.1 }}
+          transition={{ duration: 0.2 }}
+        >
+          {icon}
+        </motion.span>
+        <span className="font-medium">{label}</span>
       </Link>
     </motion.div>
   );
